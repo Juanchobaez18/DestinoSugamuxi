@@ -1,0 +1,743 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300..900;1,300..900&display=swap');
+
+@keyframes floatAmbient {
+
+  0%,
+  100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+
+  50% {
+    transform: translateY(-8px) rotate(0.5deg);
+  }
+}
+
+@keyframes shimmerBackground {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* ── Design Tokens — Paleta Sugamuxi ───────────────────── */
+/*
+   Inspirada en los elementos naturales y culturales de la
+   Provincia de Sugamuxi:
+     · Verde páramo / fauna   → --color-paramo
+     · Azul lagos / cielo     → --color-lago
+     · Rojo vino / tierra     → --color-tierra
+     · Café / madera          → --color-cafe
+     · Oscuro hero            → --color-dark
+*/
+:root {
+  /* ── Verde Páramo (fauna, naturaleza) ── */
+  --color-primary:    #3A6B2A;   /* verde bosque profundo */
+  --color-primary-l:  #4E8A39;   /* verde medio páramo    */
+  --color-primary-xl: #6BAF4A;   /* verde claro fresco    */
+
+  /* ── Azul Lagos (Lago de Tota, cielos) ── */
+  --color-lago:       #1E4D7B;   /* azul lago profundo    */
+  --color-lago-l:     #2E6EA8;   /* azul medio andino     */
+  --color-lago-xl:    #4A8EC2;   /* azul cielo claro      */
+
+  /* ── Rojo Tierra / Vino (héroe, cerámica) ── */
+  --color-tierra:     #6B1A2A;   /* vino / rojo tierra    */
+  --color-tierra-l:   #8C2C3E;   /* rojo medio cálido     */
+
+  /* ── Café / Madera (artesanías, lana) ── */
+  --color-gold:       #7A4B1E;   /* café oscuro cálido    */
+  --color-gold-l:     #A0683A;   /* café medio            */
+  --color-gold-xl:    #C4895A;   /* café claro / arena    */
+
+  /* ── Fondo y textos ── */
+  --color-cream:      #FAF7F2;   /* crema natural         */
+  --color-dark:       #0D1520;   /* azul-noche del hero   */
+  --color-dark-2:     #16243A;   /* variante oscura       */
+  --color-dark-green: #0F1A14;   /* verde noche           */
+  --color-text:       #243040;   /* texto principal       */
+  --color-text-light: #627080;   /* texto secundario      */
+  --color-white:      #FFFFFF;
+  --color-gray-50:    #F5F8FA;
+  --color-gray-100:   #E8EFF5;
+  --color-gray-200:   #C8D8E5;
+
+  --font-body: 'Montserrat', sans-serif;
+  --font-serif: 'Montserrat', sans-serif;
+
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-full: 9999px;
+
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 8px 32px rgba(0, 0, 0, 0.10);
+  --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.14);
+  --shadow-xl: 0 40px 100px rgba(0, 0, 0, 0.18);
+
+  --nav-height: 80px;
+  --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ── Reset ─────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-size: 16px;
+}
+
+body {
+  font-family: var(--font-body);
+  color: var(--color-text);
+  background: var(--color-white);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+
+img {
+  display: block;
+  max-width: 100%;
+  /* Mejor renderización de imágenes */
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+  -ms-interpolation-mode: bicubic;
+}
+
+/* Imágenes de cover: optimización de pintura */
+img[style*="object-fit: cover"],
+img[style*="objectFit: cover"] {
+  will-change: transform;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-family: inherit;
+}
+
+ul,
+ol {
+  list-style: none;
+}
+
+/* ── Scrollbar ─────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-dark);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-lago);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-tierra);
+}
+
+/* ── Utility ───────────────────────────────────────────── */
+.container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.container-wide {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 32px;
+}
+
+/* ── Section base ──────────────────────────────────────── */
+.section-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--color-gold);
+  margin-bottom: 16px;
+}
+
+.section-label::before {
+  content: '';
+  display: block;
+  width: 32px;
+  height: 2px;
+  background: var(--color-gold);
+  border-radius: 2px;
+}
+
+/* ── Buttons ───────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: 0.04em;
+  padding: 14px 28px;
+  border-radius: var(--radius-full);
+  transition: all var(--transition);
+}
+
+.btn-primary {
+  background: var(--color-primary);
+  color: var(--color-white);
+  box-shadow: 0 4px 20px rgba(58,107,42,0.38);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primary::after,
+.btn-gold::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -150%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+  transform: skewX(-20deg);
+  transition: none;
+}
+
+.btn-primary:hover::after,
+.btn-gold:hover::after {
+  animation: shimmer-btn 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-primary:hover {
+  background: var(--color-primary-l);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(58,107,42,0.50);
+}
+
+.btn-outline {
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  color: var(--color-white);
+  background: transparent;
+  backdrop-filter: blur(8px);
+}
+
+.btn-outline:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: var(--color-white);
+  transform: translateY(-2px);
+}
+
+.btn-gold {
+  background: var(--color-gold-xl);
+  color: #1a0e06;
+  box-shadow: 0 4px 20px rgba(196,137,90,0.45);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-gold:hover {
+  background: var(--color-gold-l);
+  color: var(--color-white);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(160,104,58,0.55);
+}
+
+/* ── Cards ─────────────────────────────────────────────── */
+.card {
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--color-white);
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition);
+}
+
+.card:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* ── Animations ────────────────────────────────────────── */
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(32px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-16px);
+  }
+}
+
+@keyframes pulse-ring {
+  0% {
+    transform: scale(0.9);
+    opacity: 0.8;
+  }
+
+  70% {
+    transform: scale(1.4);
+    opacity: 0;
+  }
+
+  100% {
+    transform: scale(1.4);
+    opacity: 0;
+  }
+}
+
+@keyframes pulse {
+
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.5;
+    transform: scale(0.85);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% center;
+  }
+
+  100% {
+    background-position: 200% center;
+  }
+}
+
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shimmer-btn {
+  0% { left: -150%; }
+  100% { left: 150%; }
+}
+
+.noise-bg {
+  position: relative;
+}
+.noise-bg::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.45;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+.animate-fade-up {
+  animation: fadeUp 0.8s var(--transition) forwards;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.6s ease forwards;
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-spin-slow {
+  animation: spin-slow 20s linear infinite;
+}
+
+/* ── Page transitions ──────────────────────────────────── */
+.page-enter {
+  animation: fadeUp 0.6s ease forwards;
+}
+
+/* ── Hero overlay ──────────────────────────────────────── */
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom,
+      rgba(13,21,32,0.35) 0%,
+      rgba(13,21,32,0.15) 40%,
+      rgba(13,21,32,0.75) 100%);
+}
+
+/* ── Responsive: navbar ────────────────────────────────── */
+@media (max-width: 900px) {
+  .nav-desktop {
+    display: none !important;
+  }
+
+  .nav-mobile-btn {
+    display: flex !important;
+  }
+}
+
+@media (min-width: 901px) {
+  .nav-desktop {
+    display: flex !important;
+  }
+
+  .nav-mobile-btn {
+    display: none !important;
+  }
+}
+
+.nav-mobile-btn {
+  display: none;
+}
+
+/* ── Responsive: cultura alternating grid ──────────────── */
+@media (max-width: 768px) {
+  .culture-grid {
+    grid-template-columns: 1fr !important;
+    direction: ltr !important;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   RESPONSIVE — Mobile & Tablet (sin cambiar el diseño)
+══════════════════════════════════════════════════════════ */
+
+/* ── Containers padding móvil ───────────────────────────── */
+@media (max-width: 640px) {
+  .container,
+  .container-wide {
+    padding: 0 16px;
+  }
+}
+
+/* ── Navbar móvil ───────────────────────────────────────── */
+@media (max-width: 640px) {
+  header[style] {
+    width: 96% !important;
+    padding: 0 18px !important;
+  }
+}
+
+/* ── Hero section ───────────────────────────────────────── */
+@media (max-width: 768px) {
+  .hero-btn-group {
+    flex-direction: column;
+    align-items: center;
+  }
+  .hero-btn-group a,
+  .hero-btn-group button {
+    width: 100%;
+    justify-content: center;
+    max-width: 320px;
+  }
+}
+
+/* ── Stats bar ──────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .stats-grid {
+    grid-template-columns: 1fr 1fr !important;
+  }
+}
+
+/* ── Destinos grid ──────────────────────────────────────── */
+@media (max-width: 480px) {
+  .destinos-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ── Experiencias filter tabs ───────────────────────────── */
+@media (max-width: 640px) {
+  .filter-tabs {
+    padding: 10px 16px !important;
+  }
+}
+
+/* ── Contacto form 2-col → 1-col ────────────────────────── */
+@media (max-width: 560px) {
+  .contact-two-col {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ── Contacto form padding ──────────────────────────────── */
+@media (max-width: 640px) {
+  .contact-form-box {
+    padding: 28px 20px !important;
+  }
+}
+
+/* ── Section padding reduction móvil ───────────────────── */
+@media (max-width: 768px) {
+  .section-reduce-pad {
+    padding: 60px 0 !important;
+  }
+}
+@media (max-width: 480px) {
+  .section-reduce-pad {
+    padding: 48px 0 !important;
+  }
+}
+
+/* ── Timeline móvil ─────────────────────────────────────── */
+@media (max-width: 640px) {
+  .timeline-line {
+    left: 16px !important;
+    transform: none !important;
+  }
+  .timeline-item {
+    flex-direction: column !important;
+    text-align: left !important;
+    padding-left: 44px !important;
+    gap: 8px !important;
+  }
+  .timeline-dot {
+    position: absolute !important;
+    left: 8px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+  }
+  .timeline-spacer {
+    display: none !important;
+  }
+  .timeline-content {
+    padding: 0 !important;
+    flex: none !important;
+    width: 100% !important;
+  }
+}
+
+/* ── Map placeholder móvil ──────────────────────────────── */
+@media (max-width: 640px) {
+  .map-placeholder {
+    height: 220px !important;
+  }
+}
+
+/* ── CTA heading font size móvil ────────────────────────── */
+@media (max-width: 480px) {
+  .cta-heading {
+    font-size: 28px !important;
+  }
+}
+
+/* ── Footer bottom bar ──────────────────────────────────── */
+@media (max-width: 560px) {
+  .footer-bottom {
+    flex-direction: column !important;
+    text-align: center !important;
+  }
+}
+
+/* ── Experiencias/Destinos page header height ───────────── */
+@media (max-width: 640px) {
+  .page-header-sm {
+    height: 280px !important;
+  }
+  .page-header-md {
+    height: 320px !important;
+  }
+}
+
+/* ── Cultura image height ───────────────────────────────── */
+@media (max-width: 768px) {
+  .culture-img {
+    height: 260px !important;
+  }
+}
+
+/* ── Experiences/Destinos grid min-width override ───────── */
+@media (max-width: 560px) {
+  .exp-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   RESPONSIVE — Mejoras adicionales globales
+══════════════════════════════════════════════════════════ */
+
+/* ── Cards: ancho completo en móvil ──────────────────────── */
+@media (max-width: 640px) {
+  .card-2010 {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+}
+
+/* ── Highlights / Destinos grid responsive ───────────────── */
+@media (max-width: 900px) {
+  .highlights-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+@media (max-width: 560px) {
+  .highlights-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ── DestacadoCard grid responsive ──────────────────────── */
+@media (max-width: 900px) {
+  .destacado-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+@media (max-width: 560px) {
+  .destacado-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+  /* Reduce height of tall cards on mobile */
+  .destacado-card-inner {
+    height: 300px !important;
+  }
+}
+
+/* ── Hero section text sizing ────────────────────────────── */
+@media (max-width: 480px) {
+  .hero-title {
+    font-size: clamp(32px, 9vw, 56px) !important;
+  }
+  .hero-subtitle {
+    font-size: 15px !important;
+  }
+}
+
+/* ── Stats grid responsive ───────────────────────────────── */
+@media (max-width: 768px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 12px !important;
+  }
+}
+@media (max-width: 400px) {
+  .stats-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ── Section headings scale down on mobile ───────────────── */
+@media (max-width: 640px) {
+  h2[style*="clamp"] {
+    font-size: clamp(26px, 7vw, 48px) !important;
+  }
+}
+
+/* ── Experiences cards height on mobile ─────────────────── */
+@media (max-width: 560px) {
+  .exp-card-img {
+    height: 200px !important;
+  }
+}
+
+/* ── Cultura alternating sections ────────────────────────── */
+@media (max-width: 768px) {
+  .culture-grid {
+    grid-template-columns: 1fr !important;
+    direction: ltr !important;
+  }
+  .culture-img {
+    height: 240px !important;
+    border-radius: var(--radius-lg) !important;
+  }
+}
+
+/* ── Footer columns ──────────────────────────────────────── */
+@media (max-width: 768px) {
+  .footer-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 32px !important;
+  }
+}
+@media (max-width: 480px) {
+  .footer-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ── Contacto page form ──────────────────────────────────── */
+@media (max-width: 768px) {
+  .contact-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ── Smooth image loading ────────────────────────────────── */
+img {
+  transition: opacity 0.3s ease;
+}
+img[loading="lazy"] {
+  opacity: 0;
+}
+img[loading="lazy"].loaded,
+img:not([loading]) {
+  opacity: 1;
+}
