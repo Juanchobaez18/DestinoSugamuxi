@@ -4,6 +4,7 @@ import { createPortal } from 'react-dom';
 interface Atractivo {
   id: number;
   nombre: string;
+  resumen: string;
   descripcion: string;
   top: string;
   left: string;
@@ -13,20 +14,20 @@ interface Atractivo {
 
 export default function MapaInteractivo() {
   const atractivos: Atractivo[] = [
-    { id: 1, nombre: 'Nobsa', top: '27%', left: '62%', descripcion: 'Famoso por sus ruanas de lana, artesanías y viñedos.', link: 'https://www.nobsa-boyaca.gov.co/', imagen: '/assets/nobsa/PanoramicaNobsa.jpg' },
-    { id: 2, nombre: 'Tibasosa', top: '21%', left: '51%', descripcion: 'Conocido por su arquitectura colonial y productos de feijoa.', link: 'https://www.tibasosa-boyaca.gov.co/', imagen: 'https://upload.wikimedia.org/wikipedia/commons/c/c7/Tibasosa.jpg' },
-    { id: 3, nombre: 'Iza', top: '38%', left: '45%', descripcion: 'Famoso por sus postres tradicionales y aguas termales.', link: 'https://www.iza-boyaca.gov.co/', imagen: '/assets/iza/PanoramicaIza.jpg' },
-    { id: 4, nombre: 'Firavitoba', top: '26%', left: '41%', descripcion: 'Hogar de la imponente Basílica de Nuestra Señora de las Nieves.', link: 'https://www.firavitoba-boyaca.gov.co/', imagen: 'https://upload.wikimedia.org/wikipedia/commons/8/8c/Firavitoba.jpg' },
-    { id: 5, nombre: 'Pesca', top: '34%', left: '23%', descripcion: 'Municipio agrícola reconocido por sus paisajes campesinos.', link: 'https://www.pesca-boyaca.gov.co/', imagen: 'https://upload.wikimedia.org/wikipedia/commons/5/57/IGLESIA_DE_PESCA%2C_BOYACA._-_panoramio.jpg' },
-    { id: 6, nombre: 'Tota', top: '42%', left: '28%', descripcion: 'Puerta de entrada al majestuoso Lago de Tota.', link: 'https://www.tota-boyaca.gov.co/', imagen: '/assets/tota/PanoramicaTota.jpg' },
-    { id: 7, nombre: 'Aquitania', top: '65%', left: '15%', descripcion: 'Capital cebollera a orillas del Lago de Tota y Playa Blanca.', link: 'https://www.aquitania-boyaca.gov.co/', imagen: 'https://upload.wikimedia.org/wikipedia/commons/9/9f/Aquitania_Boyaca.JPG' },
-    { id: 8, nombre: 'Cuítiva', top: '40%', left: '38%', descripcion: 'Pueblo acogedor rodeado del ecosistema del lago.', link: 'https://www.cuitiva-boyaca.gov.co/', imagen: 'https://upload.wikimedia.org/wikipedia/commons/4/4e/Cuitiva_urbano.JPG' },
-    { id: 9, nombre: 'Sogamoso', top: '39%', left: '51%', descripcion: 'La Ciudad del Sol y del Acero, centro cultural Muisca.', link: 'https://www.sogamoso-boyaca.gov.co/', imagen: '/assets/sogamoso/PanoramicaSogamoso.jpg' },
-    { id: 10, nombre: 'Monguí', top: '41%', left: '62%', descripcion: 'Pueblo patrimonio famoso por sus balones de cuero.', link: 'https://www.mongui-boyaca.gov.co/', imagen: 'https://upload.wikimedia.org/wikipedia/commons/5/59/Mongu%C3%AD.jpg' },
-    { id: 11, nombre: 'Mongua', top: '52%', left: '74%', descripcion: 'Tierra de páramos, la Laguna Negra y arqueología.', link: 'https://www.mongua-boyaca.gov.co/', imagen: '/assets/mongua/PanoramicaMongua.jpg' },
-    { id: 12, nombre: 'Tópaga', top: '38%', left: '69%', descripcion: 'Reconocido por su artesanía en carbón y el Cañón del Río Gámeza.', link: 'https://www.topaga-boyaca.gov.co/', imagen: '/assets/topaga/PanoramicaTopaga.jpg' },
-    { id: 13, nombre: 'Gámeza', top: '39%', left: '77%', descripcion: 'Escenario de la gesta libertadora y paisajes cordilleranos.', link: 'https://www.gameza-boyaca.gov.co/', imagen: 'https://upload.wikimedia.org/wikipedia/commons/9/9c/Gameza_entrada.JPG' },
-    { id: 14, nombre: 'Playa Blanca', top: '56%', left: '43%', descripcion: 'Famosa playa de arena blanca a orillas del Lago de Tota, ideal para acampar y ecoturismo.', link: 'https://playablanca.corpoboyaca.gov.co/bookings/create?bookable_id=4', imagen: '/assets/PlayaBlanca.jpg' },
+    { id: 1, nombre: 'Nobsa', resumen: 'Famoso por sus ruanas de lana, artesanías y viñedos.', top: '30%', left: '62%', descripcion: 'Festividades: Pago a la cultura Calima, Día Mundial de la Ruana, Festividades en honor a San Roque, Festival de la Breva, Festival Vallenato, Nobsa se vuelve pesebre, Festival de la Vid y el Vino, Festival Cuerdas de mi Tierra, Festival de Bandas Heráldicas.\n\nGastronomía: Postres, conservas y derivados de la breva; vinos Marqués de Puntalarga.', link: 'https://www.nobsa-boyaca.gov.co/', imagen: '/assets/nobsa/PanoramicaNobsa.jpg' },
+    { id: 2, nombre: 'Tibasosa', resumen: 'Conocido por su arquitectura colonial y productos de feijoa.', top: '24%', left: '51%', descripcion: 'Festividades: Festival de la Feijoa, Fiestas Patronales de Tibasosa, Reinado Nacional y Departamental de la Tercera Edad y la Salud.\n\nGastronomía: Productos derivados de la feijoa, carne a la llanera, amasijos ancestrales.', link: 'https://www.tibasosa-boyaca.gov.co/', imagen: 'https://upload.wikimedia.org/wikipedia/commons/c/c7/Tibasosa.jpg' },
+    { id: 3, nombre: 'Iza', resumen: 'Famoso por sus postres tradicionales y aguas termales.', top: '42%', left: '45%', descripcion: 'Festividades: Reinado de la Identidad Izana y del Postre, Noche del Boyacensismo.\n\nGastronomía: Variedad de postres tradicionales, trucha arcoíris.', link: 'https://www.iza-boyaca.gov.co/', imagen: '/assets/iza/PanoramicaIza.jpg' },
+    { id: 4, nombre: 'Firavitoba', resumen: 'Hogar de la imponente Basílica de Nuestra Señora de las Nieves.', top: '30%', left: '41%', descripcion: 'Festividades: Celebración Madre Sor Gabrielle de San Martín, Toma Cultural Firavitobense, Festival del Torbellino Firavitobense.\n\nGastronomía: Amasijos (mogollas, pan y almojábanas al horno de leña), el Ronga.', link: 'https://www.firavitoba-boyaca.gov.co/', imagen: 'https://upload.wikimedia.org/wikipedia/commons/8/8c/Firavitoba.jpg' },
+    { id: 5, nombre: 'Pesca', resumen: 'Municipio agrícola reconocido por sus paisajes campesinos.', top: '38%', left: '23%', descripcion: 'Festividades: Celebración de Semana Santa, Festival Cuncutuma Pescano, Festival de Boyacensidad Pescana, Aguinaldo Pescano.\n\nGastronomía: Cordero asado, amasijos, colaciones pescanas, bebidas artesanales.', link: 'https://www.pesca-boyaca.gov.co/', imagen: 'https://upload.wikimedia.org/wikipedia/commons/5/57/IGLESIA_DE_PESCA%2C_BOYACA._-_panoramio.jpg' },
+    { id: 6, nombre: 'Tota', resumen: 'Puerta de entrada al majestuoso Lago de Tota.', top: '46%', left: '28%', descripcion: 'Festividades: Festival de Tradición Oral y Música Campesina (Cuerda de Oro), desfile de carrozas y comparsas, ferias y fiestas de tradición cultural en honor al Santo Cristo y la Virgen de los Dolores, Aguinaldo Totense y fiesta de la Virgen del Carmen.\n\nGastronomía: Puntotense, trucha arcoíris, sopa de agro, guarapo, cachuca de trigo, mazamorra dulce.', link: 'https://www.tota-boyaca.gov.co/', imagen: '/assets/tota/PanoramicaTota.jpg' },
+    { id: 7, nombre: 'Aquitania', resumen: 'Capital cebollera a orillas del Lago de Tota y Playa Blanca.', top: '69%', left: '15%', descripcion: 'Festividades: Ferias y fiestas en honor al Señor de los Milagros, fiesta de la Virgen del Carmen, fiestas de Cuasimodo y Semana Santa, baile en honor a San Pedro.\n\nGastronomía: Trucha arcoíris, pan de cebolla, cocido boyacense.', link: 'https://www.aquitania-boyaca.gov.co/', imagen: 'https://upload.wikimedia.org/wikipedia/commons/9/9f/Aquitania_Boyaca.JPG' },
+    { id: 8, nombre: 'Cuítiva', resumen: 'Pueblo acogedor rodeado del ecosistema del lago.', top: '44%', left: '38%', descripcion: 'Festividades: Ferias y fiestas patronales de Cuítiva en honor a Santo Cristo, San Isidro Labrador y Virgen de los Dolores; Aguinaldo Cuitivense, fiestas de la Virgen del Carmen, Feria Ganadera Mitaca.\n\nGastronomía: Platos y amasijos tradicionales de la región.', link: 'https://www.cuitiva-boyaca.gov.co/', imagen: 'https://upload.wikimedia.org/wikipedia/commons/4/4e/Cuitiva_urbano.JPG' },
+    { id: 9, nombre: 'Sogamoso', resumen: 'La Ciudad del Sol y del Acero, centro cultural Muisca.', top: '43%', left: '51%', descripcion: 'Festividades: Festividades del Sol y Fiesta del Huan, Festival Musical Carranguero, Festival Músico-Andina Zue de Oro, Festival de Sabores y Saberes Ancestrales Campesinos.\n\nGastronomía: Derivados de la mazorca, amasijos, empanada Sampedrana, carne a la llanera.', link: 'https://www.sogamoso-boyaca.gov.co/', imagen: '/assets/sogamoso/PanoramicaSogamoso.jpg' },
+    { id: 10, nombre: 'Monguí', resumen: 'Pueblo patrimonio famoso por sus balones de cuero.', top: '45%', left: '62%', descripcion: 'Festividades: Fiesta de los Reyes Magos, Semana Santa, Festival Nacional del Balón, Fiesta de la Virgen de Monguí, Aguinaldo Monguiño.\n\nGastronomía: Cocido boyacense, trucha arcoíris, amasijos, jutes de papa.', link: 'https://www.mongui-boyaca.gov.co/', imagen: 'https://upload.wikimedia.org/wikipedia/commons/5/59/Mongu%C3%AD.jpg' },
+    { id: 11, nombre: 'Mongua', resumen: 'Tierra de páramos, la Laguna Negra y arqueología.', top: '56%', left: '74%', descripcion: 'Festividades: Fiestas Patronales de San Jerónimo, Festival del Café Salinas de Mongua, Fiesta de los Matachines, Festival del Sol Naciente.\n\nGastronomía: Jutes, cocido boyacense.', link: 'https://www.mongua-boyaca.gov.co/', imagen: '/assets/mongua/PanoramicaMongua.jpg' },
+    { id: 12, nombre: 'Tópaga', resumen: 'Reconocido por su artesanía en carbón y el Cañón del Río Gámeza.', top: '42%', left: '69%', descripcion: 'Festividades: Semana Santa, Festival de la Cachanga, Aguinaldo Topaguense (matachines, disfraces y murgas), Fiestas Patronales en honor a San Judas Tadeo, desfile de Toros de Candela.\n\nGastronomía: Carne a la llanera, mutes, mogolla, queso de cabeza, masato, sancocho, cuajada, arepa aliada, cocido boyacense.', link: 'https://www.topaga-boyaca.gov.co/', imagen: '/assets/topaga/PanoramicaTopaga.jpg' },
+    { id: 13, nombre: 'Gámeza', resumen: 'Escenario de la gesta libertadora y paisajes cordilleranos.', top: '43%', left: '77%', descripcion: 'Festividades: Conmemoración Batalla del Puente de los Molinos, festividades en honor a la Virgen del Carmen, Aguinaldo Gamecense y Festival de Danzas.\n\nGastronomía: Papa tocarreña y sus derivados, cocido boyacense, gallina criolla, uchuva.', link: 'https://www.gameza-boyaca.gov.co/', imagen: 'https://upload.wikimedia.org/wikipedia/commons/9/9c/Gameza_entrada.JPG' },
+    { id: 14, nombre: 'Playa Blanca', resumen: 'Famosa playa de arena blanca a orillas del Lago de Tota, ideal para acampar y ecoturismo.', top: '60%', left: '43%', descripcion: 'Famosa playa de arena blanca a orillas del Lago de Tota, ideal para acampar y ecoturismo.', link: 'https://playablanca.corpoboyaca.gov.co/bookings/create?bookable_id=4', imagen: '/assets/PlayaBlanca.jpg' },
   ];
 
   const [puntoSeleccionadoId, setPuntoSeleccionadoId] = useState<number | null>(null);
@@ -316,7 +317,7 @@ export default function MapaInteractivo() {
                           {atractivo.nombre}
                         </h4>
                         <p style={{ margin: 0, fontSize: '12px', color: '#cbd5e1', lineHeight: '1.35' }}>
-                          {atractivo.descripcion}
+                          {atractivo.resumen}
                         </p>
                       </div>
                     </div>
@@ -421,9 +422,9 @@ export default function MapaInteractivo() {
                     bottom: 0,
                     left: 0,
                     right: 0,
-                    backgroundColor: 'rgba(8, 15, 35, 0.78)',
-                    backdropFilter: 'blur(18px)',
-                    WebkitBackdropFilter: 'blur(18px)',
+                    backgroundColor: 'rgba(8, 15, 35, 0.62)',
+                    backdropFilter: 'blur(20px)',
+                    WebkitBackdropFilter: 'blur(20px)',
                     borderTop: '1px solid rgba(255, 255, 255, 0.12)',
                     padding: '24px',
                     zIndex: 5,
@@ -441,7 +442,7 @@ export default function MapaInteractivo() {
                     </h3>
                   </div>
                   
-                  <p style={{ margin: 0, fontSize: '14px', color: '#e2e8f0', lineHeight: '1.6', textShadow: '0 1px 3px rgba(0,0,0,0.6)' }}>
+                  <p style={{ margin: 0, fontSize: '14px', color: '#e2e8f0', lineHeight: '1.6', textShadow: '0 1px 3px rgba(0,0,0,0.6)', whiteSpace: 'pre-line', maxHeight: '180px', overflowY: 'auto' }}>
                     {puntoDetalle.descripcion}
                   </p>
 
