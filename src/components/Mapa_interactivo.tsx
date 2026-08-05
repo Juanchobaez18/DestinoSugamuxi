@@ -34,9 +34,28 @@ export default function MapaInteractivo() {
   const [puntoDetalle, setPuntoDetalle] = useState<Atractivo | null>(null);
   const [estaAmpliado, setEstaAmpliado] = useState<boolean>(false);
   const [montado, setMontado] = useState<boolean>(false);
+  const [isMobile, setIsMobile] = useState<boolean>(false);
+  const [isLandscape, setIsLandscape] = useState<boolean>(false);
 
   useEffect(() => {
     setMontado(true);
+
+    const mediaQuery = window.matchMedia('(max-width: 768px)');
+    const manejarCambio = () => {
+      setIsMobile(mediaQuery.matches);
+      setIsLandscape(window.innerWidth > window.innerHeight);
+    };
+
+    manejarCambio();
+    mediaQuery.addEventListener('change', manejarCambio);
+    window.addEventListener('resize', manejarCambio);
+    window.addEventListener('orientationchange', manejarCambio);
+
+    return () => {
+      mediaQuery.removeEventListener('change', manejarCambio);
+      window.removeEventListener('resize', manejarCambio);
+      window.removeEventListener('orientationchange', manejarCambio);
+    };
   }, []);
 
   useEffect(() => {
@@ -103,15 +122,15 @@ export default function MapaInteractivo() {
           position: 'fixed',
           top: 0,
           left: 0,
-          width: '100vw',
-          height: '100vh',
+          right: 0,
+          bottom: 0,
           backgroundColor: 'rgba(5, 10, 20, 0.88)',
           backdropFilter: 'blur(12px)',
           zIndex: 999999,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          padding: '24px',
+          padding: isMobile ? (isLandscape ? '8px' : '12px') : '24px',
           boxSizing: 'border-box',
           animation: 'overlayFadeIn 0.3s ease-out forwards',
         }}
@@ -122,13 +141,15 @@ export default function MapaInteractivo() {
           style={{
             position: 'relative',
             width: '100%',
-            maxWidth: '1480px',
-            maxHeight: '98vh',
+            maxWidth: isMobile ? (isLandscape ? '98%' : '100%') : '1480px',
+            maxHeight: isMobile ? '100%' : '98vh',
             height: 'auto',
+            overflowY: 'auto',
+            overflowX: 'hidden',
             backgroundColor: '#0b1329',
             border: '1px solid rgba(255, 255, 255, 0.1)',
             borderRadius: '24px',
-            padding: '28px',
+            padding: isMobile ? (isLandscape ? '12px' : '14px') : '28px',
             boxShadow: '0 30px 60px -15px rgba(0, 0, 0, 0.9), 0 0 30px rgba(249, 115, 22, 0.1)',
             display: 'flex',
             flexDirection: 'column',
@@ -143,8 +164,8 @@ export default function MapaInteractivo() {
             aria-label="Cerrar mapa"
             style={{
               position: 'absolute',
-              top: '20px',
-              right: '20px',
+              top: isMobile ? '12px' : '20px',
+              right: isMobile ? '12px' : '20px',
               width: '40px',
               height: '40px',
               borderRadius: '50%',
@@ -177,8 +198,8 @@ export default function MapaInteractivo() {
           <h3
             style={{
               color: '#f8fafc',
-              marginBottom: '20px',
-              fontSize: '20px',
+              marginBottom: isMobile ? (isLandscape ? '8px' : '12px') : '20px',
+              fontSize: isMobile ? '16px' : '20px',
               fontWeight: '700',
               letterSpacing: '0.5px',
               textShadow: '0 2px 10px rgba(0,0,0,0.5)',
@@ -205,7 +226,8 @@ export default function MapaInteractivo() {
                 display: 'block',
                 width: '100%',
                 height: 'auto',
-                maxHeight: '82vh',
+                maxHeight: isMobile ? (isLandscape ? '60vh' : '72vh') : '82vh',
+                objectFit: 'contain',
                 borderRadius: '16px',
               }}
             />
@@ -237,8 +259,8 @@ export default function MapaInteractivo() {
                       position: 'absolute',
                       top: '-5px',
                       left: '-5px',
-                      width: '30px',
-                      height: '30px',
+                      width: isMobile ? '24px' : '30px',
+                      height: isMobile ? '24px' : '30px',
                       borderRadius: '50%',
                       backgroundColor: estaSeleccionado ? 'rgba(34, 197, 94, 0.6)' : 'rgba(249, 115, 22, 0.6)',
                       animation: 'pulseRing 2s infinite ease-out',
@@ -249,8 +271,8 @@ export default function MapaInteractivo() {
                   {/* Círculo central */}
                   <div
                     style={{
-                      width: '20px',
-                      height: '20px',
+                      width: isMobile ? '14px' : '20px',
+                      height: isMobile ? '14px' : '20px',
                       backgroundColor: estaSeleccionado ? '#22c55e' : '#f97316',
                       border: '2.5px solid #ffffff',
                       borderRadius: '50%',
@@ -265,13 +287,13 @@ export default function MapaInteractivo() {
                     style={{
                       position: 'absolute',
                       top: '-10px',
-                      left: '18px',
-                      padding: '4px 8px',
+                      left: isMobile ? '12px' : '18px',
+                      padding: isMobile ? '3px 6px' : '4px 8px',
                       borderRadius: '999px',
                       backgroundColor: 'rgba(15, 23, 42, 0.9)',
                       border: '1px solid rgba(249, 115, 22, 0.35)',
                       color: '#ffffff',
-                      fontSize: '10px',
+                      fontSize: isMobile ? '8px' : '10px',
                       fontWeight: 700,
                       letterSpacing: '0.5px',
                       textTransform: 'uppercase',
@@ -284,14 +306,14 @@ export default function MapaInteractivo() {
                   </div>
 
                   {/* Popup de detalle al pasar el mouse */}
-                  {estaSeleccionado && (
+                  {estaSeleccionado && !puntoDetalle && (
                     <div
                       style={{
                         position: 'absolute',
-                        bottom: '32px',
+                        bottom: isMobile ? '24px' : '32px',
                         left: '50%',
                         transform: 'translateX(-50%)',
-                        width: '220px',
+                        width: isMobile ? '170px' : '220px',
                         backgroundColor: 'rgba(15, 23, 42, 0.96)',
                         border: '1px solid rgba(249, 115, 22, 0.4)',
                         borderRadius: '14px',
@@ -307,7 +329,7 @@ export default function MapaInteractivo() {
                         alt={atractivo.nombre}
                         style={{
                           width: '100%',
-                          height: '110px',
+                          height: isMobile ? '90px' : '110px',
                           objectFit: 'cover',
                           display: 'block',
                         }}
@@ -351,19 +373,27 @@ export default function MapaInteractivo() {
                 onClick={(e) => e.stopPropagation()}
                 style={{
                   position: 'relative',
-                  width: '95%',
-                  maxWidth: '900px',
-                  height: '520px',
+                  width: isMobile && !isLandscape ? '92%' : '95%',
+                  maxWidth: isMobile && !isLandscape ? '400px' : '900px',
+                  height: isMobile ? '95%' : '520px',
+                  maxHeight: isMobile ? '95%' : '92%',
                   border: '1px solid rgba(249, 115, 22, 0.4)',
                   borderRadius: '24px',
                   overflow: 'hidden',
                   boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 30px rgba(249, 115, 22, 0.15)',
                   animation: 'modalPopIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards',
                   display: 'flex',
+                  flexDirection: isMobile && !isLandscape ? 'column' : 'row',
                   backgroundColor: '#0f172a',
                 }}
               >
-                <div style={{ flex: '1.05', position: 'relative', overflow: 'hidden' }}>
+                <div style={{ 
+                  flex: isMobile && !isLandscape ? '0 0 40%' : '1.05', 
+                  width: isMobile && !isLandscape ? '100%' : 'auto', 
+                  height: isMobile && !isLandscape ? '40%' : 'auto', 
+                  position: 'relative', 
+                  overflow: 'hidden'
+                }}>
                   <img
                     src={puntoDetalle.imagen}
                     alt={puntoDetalle.nombre}
@@ -382,70 +412,113 @@ export default function MapaInteractivo() {
                 </div>
 
                 <div style={{
-                  flex: '0.95',
+                  flex: isMobile && !isLandscape ? '1 1 60%' : '0.95',
+                  width: isMobile && !isLandscape ? '100%' : 'auto',
+                  minHeight: 0,
                   background: 'linear-gradient(135deg, rgba(8,15,35,0.92) 0%, rgba(15,23,42,0.88) 100%)',
                   backdropFilter: 'blur(18px)',
                   WebkitBackdropFilter: 'blur(18px)',
-                  padding: '28px',
+                  padding: isMobile ? '16px' : '28px',
                   display: 'flex',
                   flexDirection: 'column',
                   justifyContent: 'space-between',
-                  gap: '16px',
-                  borderLeft: '1px solid rgba(255,255,255,0.12)',
+                  gap: isMobile && !isLandscape ? '12px' : '16px',
+                  borderLeft: isMobile && !isLandscape ? 'none' : '1px solid rgba(255,255,255,0.12)',
+                  borderTop: isMobile && !isLandscape ? '1px solid rgba(255,255,255,0.12)' : 'none',
+                  overflowY: 'auto',
                 }}>
                   <div>
                     <span style={{ fontSize: '11px', textTransform: 'uppercase', color: '#f97316', fontWeight: 700, letterSpacing: '1.5px' }}>
                       Municipio / Atractivo
                     </span>
-                    <h3 style={{ margin: '8px 0 10px 0', fontSize: '26px', color: '#ffffff', fontWeight: 800, textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}>
+                    <h3 style={{ margin: '6px 0 8px 0', fontSize: isMobile ? '18px' : '26px', color: '#ffffff', fontWeight: 800, textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}>
                       {puntoDetalle.nombre}
                     </h3>
-                    <p style={{ margin: 0, fontSize: '14px', color: '#e2e8f0', lineHeight: '1.65', textShadow: '0 1px 3px rgba(0,0,0,0.6)', whiteSpace: 'pre-line', maxHeight: '280px', overflowY: 'auto' }}>
+                    <p style={{ margin: 0, fontSize: isMobile ? '13px' : '14px', color: '#e2e8f0', lineHeight: '1.5', textShadow: '0 1px 3px rgba(0,0,0,0.6)', whiteSpace: 'pre-line' }}>
                       {puntoDetalle.descripcion}
                     </p>
                   </div>
 
-                  <a
-                    href={puntoDetalle.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <div
                     style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      padding: '12px 24px',
-                      borderRadius: '12px',
-                      background: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)',
-                      color: '#ffffff',
-                      fontWeight: 600,
-                      fontSize: '14px',
-                      textDecoration: 'none',
-                      boxShadow: '0 4px 14px rgba(249, 115, 22, 0.35)',
-                      transition: 'all 0.2s ease',
-                      textAlign: 'center',
-                      width: 'fit-content',
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.transform = 'translateY(-2px)';
-                      e.currentTarget.style.boxShadow = '0 6px 20px rgba(249, 115, 22, 0.5)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.transform = 'translateY(0)';
-                      e.currentTarget.style.boxShadow = '0 4px 14px rgba(249, 115, 22, 0.35)';
+                      display: 'flex',
+                      flexDirection: 'row',
+                      gap: '8px',
+                      marginTop: isMobile ? '4px' : '0',
                     }}
                   >
-                    Más información
-                  </a>
+                    <button
+                      onClick={() => setPuntoDetalle(null)}
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        padding: isMobile ? '12px 14px' : '12px 18px',
+                        borderRadius: '12px',
+                        backgroundColor: 'rgba(255, 255, 255, 0.08)',
+                        color: '#f8fafc',
+                        border: '1px solid rgba(255, 255, 255, 0.14)',
+                        fontWeight: 600,
+                        fontSize: isMobile ? '14px' : '14px',
+                        cursor: 'pointer',
+                        minHeight: isMobile ? '42px' : '44px',
+                        width: isMobile ? '35%' : 'fit-content',
+                        transition: 'all 0.2s ease',
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.14)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.08)';
+                      }}
+                    >
+                      Cerrar
+                    </button>
+
+                    <a
+                      href={puntoDetalle.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        padding: isMobile ? '12px 14px' : '12px 24px',
+                        borderRadius: '12px',
+                        background: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)',
+                        color: '#ffffff',
+                        fontWeight: 700,
+                        fontSize: isMobile ? '14px' : '14px',
+                        textDecoration: 'none',
+                        boxShadow: '0 4px 14px rgba(249, 115, 22, 0.35)',
+                        transition: 'all 0.2s ease',
+                        textAlign: 'center',
+                        width: isMobile ? '65%' : 'fit-content',
+                        minHeight: isMobile ? '42px' : '44px',
+                        border: '1px solid rgba(255,255,255,0.12)',
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.transform = 'translateY(-2px)';
+                        e.currentTarget.style.boxShadow = '0 6px 20px rgba(249, 115, 22, 0.5)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.transform = 'translateY(0)';
+                        e.currentTarget.style.boxShadow = '0 4px 14px rgba(249, 115, 22, 0.35)';
+                      }}
+                    >
+                      Más información
+                    </a>
+                  </div>
                 </div>
 
                 <button
                   onClick={() => setPuntoDetalle(null)}
                   style={{
                     position: 'absolute',
-                    top: '16px',
-                    right: '16px',
-                    width: '36px',
-                    height: '36px',
+                    top: isMobile ? '10px' : '16px',
+                    right: isMobile ? '10px' : '16px',
+                    width: isMobile ? '30px' : '36px',
+                    height: isMobile ? '30px' : '36px',
                     borderRadius: '50%',
                     backgroundColor: 'rgba(15, 23, 42, 0.75)',
                     color: '#ffffff',
@@ -486,7 +559,7 @@ export default function MapaInteractivo() {
         style={{
           position: 'relative',
           width: '100%',
-          maxWidth: '1000px',
+          maxWidth: isMobile ? '100%' : '1000px',
           margin: '0 auto',
           cursor: 'pointer',
           borderRadius: '24px',
