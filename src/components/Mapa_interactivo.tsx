@@ -122,8 +122,9 @@ export default function MapaInteractivo() {
           style={{
             position: 'relative',
             width: '100%',
-            maxWidth: '1150px', // Tamaño más imponente
-            maxHeight: '92vh',
+            maxWidth: '1480px',
+            maxHeight: '98vh',
+            height: 'auto',
             backgroundColor: '#0b1329',
             border: '1px solid rgba(255, 255, 255, 0.1)',
             borderRadius: '24px',
@@ -192,7 +193,9 @@ export default function MapaInteractivo() {
               position: 'relative',
               display: 'inline-block',
               maxWidth: '100%',
+              width: '100%',
               margin: '0 auto',
+              flex: 1,
             }}
           >
             <img
@@ -202,7 +205,7 @@ export default function MapaInteractivo() {
                 display: 'block',
                 width: '100%',
                 height: 'auto',
-                maxHeight: '75vh',
+                maxHeight: '82vh',
                 borderRadius: '16px',
               }}
             />
@@ -349,41 +352,92 @@ export default function MapaInteractivo() {
                 style={{
                   position: 'relative',
                   width: '95%',
-                  maxWidth: '440px',
-                  height: '480px',
+                  maxWidth: '900px',
+                  height: '520px',
                   border: '1px solid rgba(249, 115, 22, 0.4)',
-                  borderRadius: '20px',
+                  borderRadius: '24px',
                   overflow: 'hidden',
                   boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 30px rgba(249, 115, 22, 0.15)',
                   animation: 'modalPopIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                  display: 'flex',
+                  backgroundColor: '#0f172a',
                 }}
               >
-                {/* Imagen de Fondo - cubre todo el card */}
-                <img
-                  src={puntoDetalle.imagen}
-                  alt={puntoDetalle.nombre}
-                  style={{
+                <div style={{ flex: '1.05', position: 'relative', overflow: 'hidden' }}>
+                  <img
+                    src={puntoDetalle.imagen}
+                    alt={puntoDetalle.nombre}
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                      display: 'block',
+                    }}
+                  />
+                  <div style={{
                     position: 'absolute',
                     inset: 0,
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'cover',
-                    zIndex: 1,
-                  }}
-                />
+                    background: 'linear-gradient(90deg, rgba(2,6,23,0.15) 0%, rgba(2,6,23,0.05) 100%)',
+                  }} />
+                </div>
 
-                {/* Gradiente superior para el botón de cierre */}
                 <div style={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  height: '80px',
-                  background: 'linear-gradient(to bottom, rgba(5,10,20,0.5) 0%, transparent 100%)',
-                  zIndex: 2,
-                }} />
+                  flex: '0.95',
+                  background: 'linear-gradient(135deg, rgba(8,15,35,0.92) 0%, rgba(15,23,42,0.88) 100%)',
+                  backdropFilter: 'blur(18px)',
+                  WebkitBackdropFilter: 'blur(18px)',
+                  padding: '28px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'space-between',
+                  gap: '16px',
+                  borderLeft: '1px solid rgba(255,255,255,0.12)',
+                }}>
+                  <div>
+                    <span style={{ fontSize: '11px', textTransform: 'uppercase', color: '#f97316', fontWeight: 700, letterSpacing: '1.5px' }}>
+                      Municipio / Atractivo
+                    </span>
+                    <h3 style={{ margin: '8px 0 10px 0', fontSize: '26px', color: '#ffffff', fontWeight: 800, textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}>
+                      {puntoDetalle.nombre}
+                    </h3>
+                    <p style={{ margin: 0, fontSize: '14px', color: '#e2e8f0', lineHeight: '1.65', textShadow: '0 1px 3px rgba(0,0,0,0.6)', whiteSpace: 'pre-line', maxHeight: '280px', overflowY: 'auto' }}>
+                      {puntoDetalle.descripcion}
+                    </p>
+                  </div>
 
-                {/* Botón de Cierre */}
+                  <a
+                    href={puntoDetalle.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      padding: '12px 24px',
+                      borderRadius: '12px',
+                      background: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)',
+                      color: '#ffffff',
+                      fontWeight: 600,
+                      fontSize: '14px',
+                      textDecoration: 'none',
+                      boxShadow: '0 4px 14px rgba(249, 115, 22, 0.35)',
+                      transition: 'all 0.2s ease',
+                      textAlign: 'center',
+                      width: 'fit-content',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform = 'translateY(-2px)';
+                      e.currentTarget.style.boxShadow = '0 6px 20px rgba(249, 115, 22, 0.5)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = 'translateY(0)';
+                      e.currentTarget.style.boxShadow = '0 4px 14px rgba(249, 115, 22, 0.35)';
+                    }}
+                  >
+                    Más información
+                  </a>
+                </div>
+
                 <button
                   onClick={() => setPuntoDetalle(null)}
                   style={{
@@ -414,69 +468,6 @@ export default function MapaInteractivo() {
                 >
                   ✕
                 </button>
-
-                {/* Área de Contenido con Glassmorphism - anclada al fondo */}
-                <div
-                  style={{
-                    position: 'absolute',
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    backgroundColor: 'rgba(8, 15, 35, 0.62)',
-                    backdropFilter: 'blur(20px)',
-                    WebkitBackdropFilter: 'blur(20px)',
-                    borderTop: '1px solid rgba(255, 255, 255, 0.12)',
-                    padding: '24px',
-                    zIndex: 5,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '14px',
-                  }}
-                >
-                  <div>
-                    <span style={{ fontSize: '11px', textTransform: 'uppercase', color: '#f97316', fontWeight: 700, letterSpacing: '1.5px' }}>
-                      Municipio / Atractivo
-                    </span>
-                    <h3 style={{ margin: '4px 0 0 0', fontSize: '24px', color: '#ffffff', fontWeight: 800, textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}>
-                      {puntoDetalle.nombre}
-                    </h3>
-                  </div>
-                  
-                  <p style={{ margin: 0, fontSize: '14px', color: '#e2e8f0', lineHeight: '1.6', textShadow: '0 1px 3px rgba(0,0,0,0.6)', whiteSpace: 'pre-line', maxHeight: '180px', overflowY: 'auto' }}>
-                    {puntoDetalle.descripcion}
-                  </p>
-
-                  <a
-                    href={puntoDetalle.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      padding: '12px 24px',
-                      borderRadius: '12px',
-                      background: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)',
-                      color: '#ffffff',
-                      fontWeight: 600,
-                      fontSize: '14px',
-                      textDecoration: 'none',
-                      boxShadow: '0 4px 14px rgba(249, 115, 22, 0.35)',
-                      transition: 'all 0.2s ease',
-                      textAlign: 'center',
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.transform = 'translateY(-2px)';
-                      e.currentTarget.style.boxShadow = '0 6px 20px rgba(249, 115, 22, 0.5)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.transform = 'translateY(0)';
-                      e.currentTarget.style.boxShadow = '0 4px 14px rgba(249, 115, 22, 0.35)';
-                    }}
-                  >
-                    Más información
-                  </a>
-                </div>
               </div>
 
 
@@ -495,12 +486,12 @@ export default function MapaInteractivo() {
         style={{
           position: 'relative',
           width: '100%',
-          maxWidth: '850px',
+          maxWidth: '1000px',
           margin: '0 auto',
           cursor: 'pointer',
-          borderRadius: '20px',
+          borderRadius: '24px',
           overflow: 'hidden',
-          boxShadow: '0 20px 40px rgba(0,0,0,0.5), 0 0 20px rgba(249, 115, 22, 0.1)',
+          boxShadow: '0 24px 48px rgba(0,0,0,0.55), 0 0 24px rgba(249, 115, 22, 0.12)',
           border: '1px solid rgba(255, 255, 255, 0.08)',
           transition: 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
         }}
