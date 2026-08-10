@@ -12,6 +12,22 @@ export default function Navbar() {
   const { lang, setLang } = useLanguage();
   const t = useTranslation();
 
+  // Detectar móvil para desactivar backdrop-filter (causa crash al zoom)
+  const [isMobileDevice, setIsMobileDevice] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (window.innerWidth <= 1024);
+  });
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobileDevice(
+        /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (window.innerWidth <= 1024)
+      );
+    };
+    window.addEventListener('resize', checkMobile, { passive: true });
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   const navItems = [
     { label: t.nav.home, href: "/" },
     { label: t.nav.destinations, href: "/destinos" },
@@ -40,7 +56,10 @@ export default function Navbar() {
   }, []);
 
   useEffect(() => {
-    const handleScroll = () => {
+    let lastRun = 0;
+    let rafId: number | null = null;
+
+    const detectBackground = () => {
       const x = window.innerWidth / 2;
       const y = 56;
       const elements = document.elementsFromPoint(x, y);
@@ -77,9 +96,21 @@ export default function Navbar() {
       setIsDarkBg(detectedSolidBg ? detectedDark : false);
     };
 
-    window.addEventListener("scroll", handleScroll);
-    handleScroll();
-    return () => window.removeEventListener("scroll", handleScroll);
+    // Throttle: ejecutar como máximo cada 200ms para no saturar el GPU
+    const handleScroll = () => {
+      const now = Date.now();
+      if (now - lastRun < 200) return;
+      lastRun = now;
+      if (rafId) cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(detectBackground);
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    detectBackground();
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      if (rafId) cancelAnimationFrame(rafId);
+    };
   }, [pathname]);
 
   const handleNavClick = () => setMenuOpen(false);
@@ -115,9 +146,11 @@ export default function Navbar() {
         display: "flex",
         alignItems: "center",
         padding: "0 32px",
-        background: "transparent",
-        backdropFilter: "blur(20px) saturate(150%)",
-        WebkitBackdropFilter: "blur(20px) saturate(150%)",
+        // En móvil: fondo opaco (evita crash GPU por backdrop-filter + fixed + zoom)
+        // En desktop: backdrop-filter blur premium
+        background: isMobileDevice ? "rgba(13,21,32,0.92)" : "transparent",
+        backdropFilter: isMobileDevice ? "none" : "blur(20px) saturate(150%)",
+        WebkitBackdropFilter: isMobileDevice ? "none" : "blur(20px) saturate(150%)",
         border: "none",
         boxShadow: "none",
         transition: "all 0.4s cubic-bezier(0.16, 1, 0.3, 1)",
@@ -208,8 +241,10 @@ export default function Navbar() {
 
       {menuOpen && (
         <div style={{
-          position: "fixed", inset: 0, background: "rgba(0,0,0,0.3)",
-          backdropFilter: "blur(30px) saturate(150%)", WebkitBackdropFilter: "blur(30px) saturate(150%)",
+          position: "fixed", inset: 0,
+          // Fondo opaco en vez de blur pesado — previene crash al zoom
+          background: "rgba(13,21,32,0.96)",
+          backdropFilter: "none", WebkitBackdropFilter: "none",
           zIndex: 1001, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
           gap: 8, animation: "fadeIn 0.3s ease",
         }}>

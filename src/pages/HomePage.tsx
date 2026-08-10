@@ -271,6 +271,10 @@ export default function HomePage() {
   const t = useTranslation();
   const { lang } = useLanguage();
 
+  // Detectar móvil para omitir animaciones pesadas (evita crash al zoom)
+  const isMobile = typeof window !== 'undefined' &&
+    (/Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || window.innerWidth <= 768);
+
   const highlights = highlightsData[lang] || highlightsData["es"];
   const stats = statsData[lang] || statsData["es"];
   const experiences = experiencesData[lang] || experiencesData["es"];
@@ -538,7 +542,8 @@ export default function HomePage() {
           `,
         }} />
 
-        {[...Array(4)].map((_, i) => (
+        {/* Floating dots decorativos — solo en desktop (en móvil saturan la GPU) */}
+        {!isMobile && [...Array(4)].map((_, i) => (
           <div key={i} style={{
             position: "absolute",
             width: 6, height: 6,
@@ -577,7 +582,8 @@ export default function HomePage() {
                 border: "1px solid rgba(74,142,194,0.35)",
                 borderRadius: "50%",
                 display: "flex", alignItems: "center", justifyContent: "center",
-                backdropFilter: "blur(10px)",
+                // Sin backdrop-filter en móvil — reduce carga GPU
+                backdropFilter: isMobile ? "none" : "blur(10px)",
               }}>
                 <Map size={44} color="var(--color-gold-xl)" />
               </div>

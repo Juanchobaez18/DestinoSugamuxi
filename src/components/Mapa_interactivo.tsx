@@ -38,7 +38,7 @@ export default function MapaInteractivo() {
     if (typeof window === 'undefined') return false;
     const userAgentMobile = /Mobi|Android|iPhone|iPad|iPod|Windows Phone/i.test(navigator.userAgent);
     const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
-    return userAgentMobile || (isTouchDevice && window.innerWidth <= 1024);
+    return userAgentMobile || (isTouchDevice && window.innerWidth <= 1366) || window.innerWidth <= 800;
   });
   const [isLandscape, setIsLandscape] = useState<boolean>(false);
 
@@ -50,7 +50,7 @@ export default function MapaInteractivo() {
     const manejarCambio = () => {
       const userAgentMobile = /Mobi|Android|iPhone|iPad|iPod|Windows Phone/i.test(navigator.userAgent);
       const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
-      const esCelular = userAgentMobile || (isTouchDevice && window.innerWidth <= 1024);
+      const esCelular = userAgentMobile || (isTouchDevice && window.innerWidth <= 1366) || window.innerWidth <= 800;
       setIsMobile(esCelular);
       setIsLandscape(landscapeQuery.matches);
     };
@@ -67,10 +67,18 @@ export default function MapaInteractivo() {
 
   useEffect(() => {
     const manejarTeclado = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setEstaAmpliado(false);
+      if (e.key === 'Escape') {
+        if (puntoDetalle) {
+          setPuntoDetalle(null);
+        } else {
+          setEstaAmpliado(false);
+        }
+      }
     };
 
-    if (estaAmpliado) {
+    const debeBloquearScroll = (estaAmpliado && !isMobile) || (puntoDetalle !== null);
+
+    if (debeBloquearScroll) {
       document.body.style.overflow = 'hidden';
       window.addEventListener('keydown', manejarTeclado);
     } else {
@@ -81,10 +89,12 @@ export default function MapaInteractivo() {
       document.body.style.overflow = '';
       window.removeEventListener('keydown', manejarTeclado);
     };
-  }, [estaAmpliado]);
+  }, [estaAmpliado, isMobile, puntoDetalle]);
 
-  // Contenido del Modal estilizado
-  const contenidoModal = estaAmpliado ? (
+  // Contenido del Modal estilizado — solo se computa en desktop
+  // En móvil se usa el render inline (línea ~641), así que no necesitamos crear
+  // el contenido del portal ni inyectar <style> tags innecesarios.
+  const contenidoModal = (!isMobile && estaAmpliado) ? (
     <>
       {/* Estilos CSS dedicados a las animaciones fluidas */}
       <style>{`
@@ -131,8 +141,7 @@ export default function MapaInteractivo() {
           left: 0,
           right: 0,
           bottom: 0,
-          backgroundColor: 'rgba(5, 10, 20, 0.88)',
-          backdropFilter: isMobile ? 'none' : 'blur(12px)',
+          backgroundColor: 'rgba(5, 10, 20, 0.96)',
           zIndex: 999999,
           display: 'flex',
           alignItems: 'center',
@@ -153,6 +162,7 @@ export default function MapaInteractivo() {
             height: 'auto',
             overflowY: 'auto',
             overflowX: 'hidden',
+            WebkitOverflowScrolling: 'touch',
             backgroundColor: '#0b1329',
             border: '1px solid rgba(255, 255, 255, 0.1)',
             borderRadius: '24px',
@@ -353,7 +363,6 @@ export default function MapaInteractivo() {
               backgroundColor: 'rgba(15, 23, 42, 0.65)',
               border: '1px solid rgba(249, 115, 22, 0.2)',
               borderRadius: '16px',
-              backdropFilter: isMobile ? 'none' : 'blur(8px)',
               boxSizing: 'border-box',
             }}
           >
@@ -432,18 +441,20 @@ export default function MapaInteractivo() {
           </div>
 
           {/* Modal de Detalle */}
-          {puntoDetalle && (
+          {puntoDetalle && createPortal(
             <div
               style={{
-                position: 'absolute',
-                inset: 0,
-                backgroundColor: 'rgba(5, 10, 20, 0.85)',
-                backdropFilter: isMobile ? 'none' : 'blur(8px)',
-                borderRadius: '24px',
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundColor: 'rgba(5, 10, 20, 0.94)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                zIndex: 100,
+                zIndex: 999999,
+                padding: '16px',
                 animation: 'overlayFadeIn 0.25s ease-out forwards',
               }}
               onClick={() => setPuntoDetalle(null)}
@@ -495,8 +506,6 @@ export default function MapaInteractivo() {
                   width: isMobile && !isLandscape ? '100%' : 'auto',
                   minHeight: 0,
                   background: 'linear-gradient(135deg, rgba(8,15,35,0.92) 0%, rgba(15,23,42,0.88) 100%)',
-                  backdropFilter: isMobile ? 'none' : 'blur(18px)',
-                  WebkitBackdropFilter: isMobile ? 'none' : 'blur(18px)',
                   padding: isMobile ? '16px' : '28px',
                   display: 'flex',
                   flexDirection: 'column',
@@ -505,6 +514,7 @@ export default function MapaInteractivo() {
                   borderLeft: isMobile && !isLandscape ? 'none' : '1px solid rgba(255,255,255,0.12)',
                   borderTop: isMobile && !isLandscape ? '1px solid rgba(255,255,255,0.12)' : 'none',
                   overflowY: 'auto',
+                  WebkitOverflowScrolling: 'touch',
                 }}>
                   <div>
                     <span style={{ fontSize: '11px', textTransform: 'uppercase', color: '#f97316', fontWeight: 700, letterSpacing: '1.5px' }}>
@@ -623,16 +633,17 @@ export default function MapaInteractivo() {
               </div>
 
 
-            </div>
+            </div>,
+            document.body
           )}
         </div>
       </div>
     </>
   ) : null;
 
-  // Renderizado inline en celular cuando el mapa está ampliado
-  // Evita por completo el uso de portales, position: fixed y filtros de desenfoque pesados (backdrop-filter) en celulares,
-  // previniendo de raíz cualquier cuelgue/reinicio del navegador móvil al hacer pinch-to-zoom.
+  // ─── Renderizado inline en celular cuando el mapa está ampliado ───
+  // Bloquea pinch-to-zoom dentro del mapa con touch-action: pan-y
+  // y suprime re-renders durante gestos multi-touch (pinch).
   if (isMobile && estaAmpliado) {
     return (
       <div
@@ -649,7 +660,6 @@ export default function MapaInteractivo() {
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          boxShadow: '0 24px 48px rgba(0,0,0,0.55), 0 0 24px rgba(249, 115, 22, 0.12)',
         }}
       >
         <div
@@ -676,6 +686,7 @@ export default function MapaInteractivo() {
             onClick={() => {
               setEstaAmpliado(false);
               setPuntoDetalle(null);
+              setPuntoSeleccionadoId(null);
             }}
             aria-label="Cerrar mapa"
             style={{
@@ -687,14 +698,13 @@ export default function MapaInteractivo() {
               cursor: 'pointer',
               fontSize: '12px',
               fontWeight: 'bold',
-              transition: 'all 0.2s ease',
             }}
           >
             ✕ Cerrar Mapa
           </button>
         </div>
 
-        {/* Contenedor principal del Mapa con ajuste ceñido a la imagen */}
+        {/* Contenedor del Mapa — touch-action: pan-y bloquea pinch-to-zoom */}
         <div
           style={{
             position: 'relative',
@@ -702,6 +712,13 @@ export default function MapaInteractivo() {
             maxWidth: '100%',
             width: '100%',
             margin: '0 auto',
+          }}
+          // Suprimir touch events que disparan hover/click durante pinch
+          onTouchStart={(e) => {
+            if (e.touches.length > 1) {
+              // Multi-touch detectado (pinch) → limpiar selección para evitar popups
+              setPuntoSeleccionadoId(null);
+            }
           }}
         >
           <img
@@ -712,54 +729,42 @@ export default function MapaInteractivo() {
               width: '100%',
               height: 'auto',
               borderRadius: '16px',
+              // No crear capa GPU extra para esta imagen
+              willChange: 'auto',
             }}
           />
 
-          {/* Puntos interactivos */}
+          {/* Puntos interactivos — versión ligera para móvil */}
           {atractivos.map((atractivo) => {
             const estaSeleccionado = puntoSeleccionadoId === atractivo.id;
 
             return (
               <div
                 key={atractivo.id}
-                onMouseEnter={() => setPuntoSeleccionadoId(atractivo.id)}
-                onMouseLeave={() => setPuntoSeleccionadoId(null)}
-                onClick={() => setPuntoDetalle(atractivo)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setPuntoDetalle(atractivo);
+                  setPuntoSeleccionadoId(null);
+                }}
                 style={{
                   position: 'absolute',
                   top: atractivo.top,
                   left: atractivo.left,
                   transform: 'translate(-50%, -50%)',
                   cursor: 'pointer',
-                  zIndex: estaSeleccionado ? 50 : 30,
+                  zIndex: 30,
+                  // Área de toque más grande para facilitar tap
+                  padding: '8px',
                 }}
               >
-                {/* Ring exterior */}
+                {/* Círculo del punto — simplificado sin box-shadow pesado */}
                 <div
                   style={{
-                    position: 'absolute',
-                    top: '-5px',
-                    left: '-5px',
-                    width: '28px',
-                    height: '28px',
+                    width: '20px',
+                    height: '20px',
+                    backgroundColor: '#f97316',
+                    border: '2px solid #ffffff',
                     borderRadius: '50%',
-                    backgroundColor: estaSeleccionado ? 'rgba(34, 197, 94, 0.6)' : 'rgba(249, 115, 22, 0.6)',
-                    animation: 'pulseRing 2s infinite ease-out',
-                    pointerEvents: 'none',
-                  }}
-                />
-
-                {/* Círculo central */}
-                <div
-                  style={{
-                    width: '18px',
-                    height: '18px',
-                    backgroundColor: estaSeleccionado ? '#22c55e' : '#f97316',
-                    border: '2.5px solid #ffffff',
-                    borderRadius: '50%',
-                    boxShadow: '0 0 12px rgba(0,0,0,0.8)',
-                    transition: 'transform 0.2s ease',
-                    transform: estaSeleccionado ? 'scale(1.3)' : 'scale(1)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -771,205 +776,106 @@ export default function MapaInteractivo() {
                 >
                   {atractivo.id}
                 </div>
-
-                {/* Popup de detalle temporal al tocar en móvil */}
-                {estaSeleccionado && !puntoDetalle && (
-                  <div
-                    style={{
-                      position: 'absolute',
-                      bottom: '24px',
-                      left: '50%',
-                      transform: 'translateX(-50%)',
-                      width: '170px',
-                      backgroundColor: 'rgba(15, 23, 42, 0.98)',
-                      border: '1px solid rgba(249, 115, 22, 0.4)',
-                      borderRadius: '14px',
-                      overflow: 'hidden',
-                      boxShadow: '0 15px 30px rgba(0,0,0,0.7)',
-                      zIndex: 60,
-                      pointerEvents: 'none',
-                      textAlign: 'left',
-                    }}
-                  >
-                    <img
-                      src={atractivo.imagen}
-                      alt={atractivo.nombre}
-                      style={{
-                        width: '100%',
-                        height: '90px',
-                        objectFit: 'cover',
-                        display: 'block',
-                      }}
-                    />
-                    <div style={{ padding: '10px 12px 12px' }}>
-                      <div style={{ fontSize: '10px', textTransform: 'uppercase', color: '#f97316', fontWeight: 700, letterSpacing: '0.5px' }}>
-                        Municipio
-                      </div>
-                      <h4 style={{ margin: '2px 0 4px 0', fontSize: '14px', color: '#ffffff', fontWeight: 700 }}>
-                        {atractivo.nombre}
-                      </h4>
-                      <p style={{ margin: 0, fontSize: '12px', color: '#cbd5e1', lineHeight: '1.35' }}>
-                        {atractivo.resumen}
-                      </p>
-                    </div>
-                  </div>
-                )}
               </div>
             );
           })}
         </div>
 
-        {/* Sección de Convenciones */}
-        <div
-          style={{
-            width: '100%',
-            marginTop: '20px',
-            padding: '16px',
-            backgroundColor: 'rgba(15, 23, 42, 0.65)',
-            border: '1px solid rgba(249, 115, 22, 0.2)',
-            borderRadius: '16px',
-            boxSizing: 'border-box',
-          }}
-        >
+        {/* Detalle del Municipio (Modal Fijo para Móvil) */}
+        {puntoDetalle && createPortal(
           <div
             style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))',
-              gap: '8px',
-              width: '100%',
-            }}
-          >
-            {atractivos.map((atractivo) => {
-              const estaSeleccionado = puntoSeleccionadoId === atractivo.id;
-              return (
-                <div
-                  key={atractivo.id}
-                  onMouseEnter={() => setPuntoSeleccionadoId(atractivo.id)}
-                  onMouseLeave={() => setPuntoSeleccionadoId(null)}
-                  onClick={() => setPuntoDetalle(atractivo)}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    padding: '8px 10px',
-                    backgroundColor: estaSeleccionado ? 'rgba(249, 115, 22, 0.15)' : 'rgba(255, 255, 255, 0.02)',
-                    border: estaSeleccionado 
-                      ? '1px solid rgba(249, 115, 22, 0.5)' 
-                      : '1px solid rgba(255, 255, 255, 0.05)',
-                    borderRadius: '10px',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s ease',
-                  }}
-                >
-                  <div
-                    style={{
-                      width: '20px',
-                      height: '20px',
-                      borderRadius: '50%',
-                      backgroundColor: estaSeleccionado ? '#22c55e' : '#f97316',
-                      color: '#ffffff',
-                      fontSize: '9px',
-                      fontWeight: 'bold',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      border: '1.5px solid #ffffff',
-                      boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
-                      flexShrink: 0,
-                    }}
-                  >
-                    {atractivo.id}
-                  </div>
-                  <span
-                    style={{
-                      color: estaSeleccionado ? '#ffffff' : '#cbd5e1',
-                      fontSize: '12px',
-                      fontWeight: estaSeleccionado ? '700' : '500',
-                      whiteSpace: 'nowrap',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                    }}
-                  >
-                    {atractivo.nombre}
-                  </span>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Modal de Detalle (Falso Modal absoluto, no fixed) */}
-        {puntoDetalle && (
-          <div
-            style={{
-              position: 'absolute',
-              inset: 0,
-              backgroundColor: 'rgba(5, 10, 20, 0.95)',
-              borderRadius: '24px',
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: 'rgba(5, 10, 20, 0.94)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              zIndex: 100,
+              zIndex: 999999,
+              padding: '16px',
+              animation: 'overlayFadeIn 0.25s ease-out forwards',
             }}
             onClick={() => setPuntoDetalle(null)}
           >
             <div
               onClick={(e) => e.stopPropagation()}
               style={{
-                position: 'relative',
-                width: '92%',
+                width: '100%',
                 maxWidth: '400px',
-                height: '92%',
-                maxHeight: '92%',
+                maxHeight: '90vh',
+                backgroundColor: '#0f172a',
                 border: '1px solid rgba(249, 115, 22, 0.4)',
                 borderRadius: '24px',
-                overflow: 'hidden',
-                boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.8)',
+                overflowY: 'auto',
                 display: 'flex',
                 flexDirection: 'column',
-                backgroundColor: '#0f172a',
+                boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.8)',
+                animation: 'modalPopIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards',
               }}
             >
-              <div style={{ flex: '0 0 40%', width: '100%', height: '40%', position: 'relative', overflow: 'hidden' }}>
+              <div style={{ width: '100%', height: '220px', position: 'relative', flexShrink: 0 }}>
                 <img
                   src={puntoDetalle.imagen}
                   alt={puntoDetalle.nombre}
                   style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
                 />
+                
+                <button
+                  onClick={() => setPuntoDetalle(null)}
+                  style={{
+                    position: 'absolute',
+                    top: '12px',
+                    right: '12px',
+                    width: '32px',
+                    height: '32px',
+                    borderRadius: '50%',
+                    backgroundColor: 'rgba(15, 23, 42, 0.75)',
+                    color: '#ffffff',
+                    border: '1px solid rgba(255, 255, 255, 0.2)',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontWeight: 'bold',
+                    fontSize: '16px',
+                    zIndex: 10,
+                  }}
+                >
+                  ✕
+                </button>
               </div>
 
               <div style={{
-                flex: '1 1 60%',
-                width: '100%',
-                minHeight: 0,
                 backgroundColor: '#080f23',
-                padding: '16px',
+                padding: '20px',
                 display: 'flex',
                 flexDirection: 'column',
-                justifyContent: 'space-between',
-                gap: '12px',
-                overflowY: 'auto',
+                gap: '16px',
+                flex: 1,
               }}>
                 <div>
                   <span style={{ fontSize: '11px', textTransform: 'uppercase', color: '#f97316', fontWeight: 700, letterSpacing: '1.5px' }}>
                     Municipio / Atractivo
                   </span>
-                  <h3 style={{ margin: '6px 0 8px 0', fontSize: '18px', color: '#ffffff', fontWeight: 800 }}>
+                  <h3 style={{ margin: '6px 0 8px 0', fontSize: '20px', color: '#ffffff', fontWeight: 800 }}>
                     {puntoDetalle.nombre}
                   </h3>
-                  <p style={{ margin: 0, fontSize: '13px', color: '#e2e8f0', lineHeight: '1.5', whiteSpace: 'pre-line' }}>
+                  <p style={{ margin: 0, fontSize: '14px', color: '#e2e8f0', lineHeight: '1.6', whiteSpace: 'pre-line' }}>
                     {puntoDetalle.descripcion}
                   </p>
                 </div>
 
-                <div style={{ display: 'flex', flexDirection: 'row', gap: '8px' }}>
+                <div style={{ display: 'flex', flexDirection: 'row', gap: '10px', marginTop: 'auto' }}>
                   <button
                     onClick={() => setPuntoDetalle(null)}
                     style={{
                       display: 'inline-flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      padding: '12px 14px',
+                      padding: '12px 16px',
                       borderRadius: '12px',
                       backgroundColor: 'rgba(255, 255, 255, 0.08)',
                       color: '#f8fafc',
@@ -991,7 +897,7 @@ export default function MapaInteractivo() {
                       display: 'inline-flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      padding: '12px 14px',
+                      padding: '12px 16px',
                       borderRadius: '12px',
                       background: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)',
                       color: '#ffffff',
@@ -1007,33 +913,80 @@ export default function MapaInteractivo() {
                   </a>
                 </div>
               </div>
+            </div>
+          </div>,
+          document.body
+        )}
 
-              <button
-                onClick={() => setPuntoDetalle(null)}
+        {/* Sección de Convenciones — lista de municipios */}
+        <div
+          style={{
+            width: '100%',
+            marginTop: '20px',
+            padding: '16px',
+            backgroundColor: 'rgba(15, 23, 42, 0.65)',
+            border: '1px solid rgba(249, 115, 22, 0.2)',
+            borderRadius: '16px',
+            boxSizing: 'border-box',
+          }}
+        >
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(2, 1fr)', // Fijo a 2 columnas para evitar reflows al hacer zoom
+              gap: '8px',
+              width: '100%',
+            }}
+          >
+            {atractivos.map((atractivo) => (
+              <div
+                key={atractivo.id}
+                onClick={() => setPuntoDetalle(atractivo)}
                 style={{
-                  position: 'absolute',
-                  top: '10px',
-                  right: '10px',
-                  width: '30px',
-                  height: '30px',
-                  borderRadius: '50%',
-                  backgroundColor: 'rgba(15, 23, 42, 0.75)',
-                  color: '#ffffff',
-                  border: '1px solid rgba(255, 255, 255, 0.2)',
-                  cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: 'center',
-                  fontWeight: 'bold',
-                  fontSize: '16px',
-                  zIndex: 10,
+                  gap: '8px',
+                  padding: '8px 10px',
+                  backgroundColor: 'rgba(255, 255, 255, 0.02)',
+                  border: '1px solid rgba(255, 255, 255, 0.05)',
+                  borderRadius: '10px',
+                  cursor: 'pointer',
                 }}
               >
-                ✕
-              </button>
-            </div>
+                <div
+                  style={{
+                    width: '20px',
+                    height: '20px',
+                    borderRadius: '50%',
+                    backgroundColor: '#f97316',
+                    color: '#ffffff',
+                    fontSize: '9px',
+                    fontWeight: 'bold',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    border: '1.5px solid #ffffff',
+                    flexShrink: 0,
+                  }}
+                >
+                  {atractivo.id}
+                </div>
+                <span
+                  style={{
+                    color: '#cbd5e1',
+                    fontSize: '12px',
+                    fontWeight: '500',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                  }}
+                >
+                  {atractivo.nombre}
+                </span>
+              </div>
+            ))}
           </div>
-        )}
+        </div>
       </div>
     );
   }
@@ -1080,7 +1033,7 @@ export default function MapaInteractivo() {
               borderRadius: '30px',
               background: 'rgba(15, 23, 42, 0.85)',
               border: '1px solid rgba(249, 115, 22, 0.4)',
-              backdropFilter: 'blur(10px)',
+              backdropFilter: isMobile ? 'none' : 'blur(10px)',
               fontSize: '14px',
               fontWeight: 600,
               color: '#ffffff',
